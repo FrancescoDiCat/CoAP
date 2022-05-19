@@ -29,40 +29,28 @@ public class CoapClientApplication implements CommandLineRunner{
         CoapClient client = new CoapClient();
         CoapURI resource_uri = new CoapURI(args.length > 0 ? args[0] : "coap://127.0.0.1/test");
 
+        Scanner s = new Scanner(System.in);
+        System.out.println("Invia un messaggio al server");
+        String message = s.nextLine();
 
-        client.request(CoapRequestMethod.GET, resource_uri, 1, "Hello".getBytes(), new CoapResponseHandler() {
-            @Override
-            public void onResponse(CoapRequest coapRequest, CoapResponse coapResponse) {
-                System.out.println(coapResponse);
-
-            }
-
-            @Override
-            public void onRequestFailure(CoapRequest coapRequest) {
-                try {
-                    throw new Exception("Errore");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+        while(!message.equalsIgnoreCase("exit")){
+            client.request(CoapRequestMethod.GET, resource_uri, 1, message.getBytes(), new CoapResponseHandler() {
+                @Override
+                public void onResponse(CoapRequest coapRequest, CoapResponse coapResponse) {
+                    System.out.println("Response: "+new String(coapResponse.getPayload()));
                 }
-            }
-        });
+
+                @Override
+                public void onRequestFailure(CoapRequest coapRequest) {
+
+                }
+            });
+            System.out.println("Invia un messaggio al server");
+            message = s.nextLine();
+        }
+
+        client.halt();
     }
-//
-//
-//        client.observe( resource_uri,new CoapResponseHandler() {
-//            @Override
-//            public void onResponse(CoapRequest req, CoapResponse resp) {
-//                System.out.println("Response: "+resp.getResponseCode()+": "+new String(resp.getPayload()));
-//            }
-//            @Override
-//            public void onRequestFailure(CoapRequest req) {
-//                System.out.println("Request failure");
-//                client.halt();
-//            }
-//        });
-////        SystemUtils.readLine();
-//        client.observeCancel(resource_uri);
-////        SystemUtils.sleep(2000);
-//
+
 
 }
