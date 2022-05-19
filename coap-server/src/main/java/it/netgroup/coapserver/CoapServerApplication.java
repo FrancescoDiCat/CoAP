@@ -22,37 +22,27 @@ public class CoapServerApplication implements CommandLineRunner{
     CoapRequest request = null;
     CoapServer server = null;
 
-    @Scheduled()
+
     public static void main(String[] args) throws SocketException {
         SpringApplication.run(CoapServerApplication.class, args);
 
     }
 
-
-     void sendMessage(String message){
-
-         CoapResponse resp= CoapMessageFactory.createResponse(request, CoapResponseCode._2_05_Content);
-         resp.setPayload(CoapResource.FORMAT_TEXT_PLAIN_UTF8,message.getBytes());
-        server.respond(request, resp);
-
-
-    }
-
     void initServer() throws SocketException {
-
         this.server = new CoapServer() {
             @Override
             protected void handleGetRequest(CoapRequest req) {
                 if (req.getRequestUriPath().equals("/test")) {
                     request = req;
+                    System.out.println(new String(req.getPayload()));
+                    CoapResponse resp = CoapMessageFactory.createResponse(req,CoapResponseCode._2_05_Content);
+                    resp.setPayload(CoapResource.FORMAT_TEXT_PLAIN_UTF8,"Ciao Client".getBytes());
+                    respond(req,resp);
 //                    CoapResponse resp= CoapMessageFactory.createResponse(req, CoapResponseCode._2_05_Content);
 //                    resp.setPayload(CoapResource.FORMAT_TEXT_PLAIN_UTF8,message.getBytes());
 //                    respond(req, resp);
                 }
-                else {
-//                    CoapResponse resp=CoapMessageFactory.createResponse(req,CoapResponseCode._4_04_Not_Found);
-//                    respond(req, resp);
-                }
+
             }
         };
         server.setWriteMode(true);
@@ -61,13 +51,5 @@ public class CoapServerApplication implements CommandLineRunner{
     @Override
     public void run(String... args) throws Exception {
         initServer();
-        String message= "";
-        Scanner s = new Scanner(System.in);
-
-        do{
-            System.out.println("Inserisci un messaggio");
-            message = s.nextLine();
-            sendMessage(message);
-        } while(!message.equalsIgnoreCase("exit"));
     }
 }
