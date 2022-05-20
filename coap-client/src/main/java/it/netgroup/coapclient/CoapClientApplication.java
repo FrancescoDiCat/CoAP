@@ -15,6 +15,11 @@ import org.zoolu.util.SystemUtils;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -29,12 +34,13 @@ public class CoapClientApplication implements CommandLineRunner{
         CoapClient client = new CoapClient();
         CoapURI resource_uri = new CoapURI(args.length > 0 ? args[0] : "coap://127.0.0.1/test");
 
-        Scanner s = new Scanner(System.in);
-        System.out.println("Invia un messaggio al server");
-        String message = s.nextLine();
+        Date date = new Date();
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String stringDate= DateFor.format(date);
 
-        while(!message.equalsIgnoreCase("exit")){
-            client.request(CoapRequestMethod.GET, resource_uri, 1, message.getBytes(), new CoapResponseHandler() {
+        //noinspection InfiniteLoopStatement
+        while(true){
+            client.request(CoapRequestMethod.GET, resource_uri, 1, stringDate.getBytes(), new CoapResponseHandler() {
                 @Override
                 public void onResponse(CoapRequest coapRequest, CoapResponse coapResponse) {
                     System.out.println("Response: "+new String(coapResponse.getPayload()));
@@ -45,11 +51,9 @@ public class CoapClientApplication implements CommandLineRunner{
 
                 }
             });
-            System.out.println("Invia un messaggio al server");
-            message = s.nextLine();
-        }
 
-        client.halt();
+            client.wait(3000);
+        }
     }
 
 

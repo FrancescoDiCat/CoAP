@@ -36,10 +36,7 @@ public class CoapServerApplication implements CommandLineRunner{
                     request = req;
                     System.out.println(new String(req.getPayload()));
                     CoapResponse resp = CoapMessageFactory.createResponse(req,CoapResponseCode._2_05_Content);
-                    System.out.println("Invia un messaggio al client");
-                    Scanner s = new Scanner(System.in);
-                    String message = s.nextLine();
-                    resp.setPayload(CoapResource.FORMAT_TEXT_PLAIN_UTF8,message.getBytes());
+                    resp.setPayload(CoapResource.FORMAT_TEXT_PLAIN_UTF8,"Ricevuto".getBytes());
                     respond(req,resp);
                 }
 
